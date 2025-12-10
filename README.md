@@ -54,7 +54,7 @@ Khai phá mẫu tập luyện thành công và xây dựng hệ thống gợi ý
 
 ## Notebooks
 
-### 1. Data Augmentation (`01_data_merge_clean.ipynb`)
+### 1. Data Augmentation (`01_data_merge_augmentation.ipynb`)
 - Merge 2 datasets
 - Add nutrition, timing, goals
 - Generate 51,633 workout records
