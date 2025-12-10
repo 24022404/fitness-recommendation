@@ -1,108 +1,99 @@
-# Gym Workout Pattern Mining
+# Khai Phá Mẫu Tập Luyện Gym
+**Khai Phá Dữ Liệu - Bài Tập Seminar**
 
-**Data Mining - Seminar Assignment**
-
-## Team Members
+## Thành Viên Nhóm
 - Nguyễn Đức Huy
 - Dương Lý Khánh Ha
 - Nguyễn Đức Minh
 
 ---
 
-## Overview
-
+## Tổng Quan
 Khai phá mẫu tập luyện thành công và xây dựng hệ thống gợi ý workout thông minh.
 
-**Methods:**
-- Association Rules Mining (Apriori) - Required
-- Classification (Random Forest)
-- Clustering (K-Means)
-- Recommendation System
+**Phương pháp:**
+- Khai phá luật kết hợp (Apriori) - Bắt buộc
+- Phân loại (Random Forest)
+- Phân cụm (K-Means)
+- Hệ thống gợi ý
 
 ---
 
-## Dataset
+## Bộ Dữ Liệu
+**Đầu vào:**
+- `gym_members_exercise_tracking.csv` - 973 người dùng
+- `megaGymDataset.csv` - 2,918 bài tập
 
-**Input:**
-- `gym_members_exercise_tracking.csv` - 973 users
-- `megaGymDataset.csv` - 2,918 exercises
+**Đầu ra:**
+- `gym_workout_sessions.csv` - 51,633 bản ghi (sau khi tăng cường)
 
-**Output:**
-- `gym_workout_sessions.csv` - 51,633 records (augmented)
-
-**Key Features Added:**
-- Goal (Weight_Loss/Muscle_Gain/Fat_Loss/Fitness)
-- Nutrition (Protein intake, Protein level, Calories)
-- Timing (Morning/Afternoon/Evening)
-- Success label (0/1)
+**Các Đặc Trưng Chính Được Thêm Vào:**
+- Mục tiêu (Giảm_Cân/Tăng_Cơ/Đốt_Mỡ/Thể_Lực)
+- Dinh dưỡng (Lượng protein, Mức protein, Calories)
+- Thời gian (Sáng/Chiều/Tối)
+- Nhãn thành công (0/1)
 
 ---
 
-## Project Structure
-
+## Cấu Trúc Dự Án
 ```
 ├── data/
 │   ├── gym_members_exercise_tracking.csv
 │   ├── megaGymDataset.csv
 │   └── gym_workout_sessions.csv
-├── 01_data_merge_clean.ipynb        # Data augmentation
-├── 02_main_analysis.ipynb           # Main analysis
+├── 01_data_merge_clean.ipynb        # Tăng cường dữ liệu
+├── 02_main_analysis.ipynb           # Phân tích chính
 └── README.md
 ```
 
 ---
 
-## Notebooks
+## Các Notebook
+### 1. Tăng Cường Dữ Liệu (`01_data_merge_augmentation.ipynb`)
+- Hợp nhất 2 bộ dữ liệu
+- Thêm dinh dưỡng, thời gian, mục tiêu
+- Tạo 51,633 bản ghi tập luyện
+- Tính toán nhãn thành công
 
-### 1. Data Augmentation (`01_data_merge_augmentation.ipynb`)
-- Merge 2 datasets
-- Add nutrition, timing, goals
-- Generate 51,633 workout records
-- Calculate success labels
+### 2. Phân Tích Chính (`02_main_analysis.ipynb`)
+**Luật Kết Hợp:**
+- Tìm thấy 140 mẫu thành công
+- Tốt nhất: `{Tần_suất_4, Protein_Cao} → Thành_Công` (Lift: 9.21)
 
-### 2. Main Analysis (`02_main_analysis.ipynb`)
+**Phân Loại:**
+- Random Forest: 99.85% độ chính xác
+- Đặc trưng quan trọng nhất: Tần_suất_mỗi_tuần (19.3%)
 
-**Association Rules:**
-- Found 140 success patterns
-- Best: `{Freq_4, Protein_High} → Success` (Lift: 9.21)
+**Phân Cụm:**
+- 4 nhóm người dùng (K-Means)
+- Cụm 3: 97% tỷ lệ thành công (tần suất cao)
 
-**Classification:**
-- Random Forest: 99.85% accuracy
-- Top feature: Frequency_per_week (19.3%)
-
-**Clustering:**
-- 4 user segments (K-Means)
-- Cluster 3: 97% success rate (high frequency)
-
-**Recommendation:**
-- Input: User profile → Output: Workout plan
-- Based on clustering + association rules
+**Gợi Ý:**
+- Đầu vào: Hồ sơ người dùng → Đầu ra: Kế hoạch tập luyện
+- Dựa trên phân cụm + luật kết hợp
 
 ---
 
-## Key Results
-
-- High frequency (4-5 days/week) = strongest success factor
-- Protein level matters: High protein → 100% success for muscle gain
-- Morning workouts slightly better than evening
-- 4 distinct user types identified
+## Kết Quả Chính
+- Tần suất cao (4-5 ngày/tuần) = yếu tố thành công mạnh nhất
+- Mức protein quan trọng: Protein cao → 100% thành công cho tăng cơ
+- Tập buổi sáng tốt hơn một chút so với buổi tối
+- Xác định được 4 nhóm người dùng khác biệt
 
 ---
 
-## Installation
-
+## Cài Đặt
 ```bash
 pip install pandas numpy matplotlib seaborn mlxtend scikit-learn
 ```
 
-Run notebooks in order:
-1. `01_data_merge_clean.ipynb` → Generate dataset
-2. `02_main_analysis.ipynb` → Run analysis
+Chạy các notebook theo thứ tự:
+1. `01_data_merge_clean.ipynb` → Tạo bộ dữ liệu
+2. `02_main_analysis.ipynb` → Chạy phân tích
 
 ---
 
-## References
-
-**Datasets:**
+## Tài Liệu Tham Khảo
+**Bộ dữ liệu:**
 - [Kaggle: Gym Members](https://www.kaggle.com/datasets/valakhorasani/gym-members-exercise-dataset)
 - [Kaggle: MegaGym](https://www.kaggle.com/datasets/niharika41298/gym-exercise-data)
