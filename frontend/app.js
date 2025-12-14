@@ -10,12 +10,14 @@ function scrollToForm() {
 document.getElementById('recommendation-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Get form data
+    // Get form data - NOW INCLUDING goal and workout_type
     const formData = {
         age: parseInt(document.getElementById('age').value),
         gender: document.querySelector('input[name="gender"]:checked').value,
         weight: parseFloat(document.getElementById('weight').value),
         height: parseFloat(document.getElementById('height').value),
+        goal: document.getElementById('goal').value,  // 🆕 User's choice
+        workout_type: document.getElementById('workout_type').value,  // 🆕 User's preference
         experience: document.getElementById('experience').value
     };
     
@@ -82,6 +84,16 @@ function validateForm(data) {
         return false;
     }
     
+    if (!data.goal) {
+        alert('Please select your fitness goal');
+        return false;
+    }
+    
+    if (!data.workout_type) {
+        alert('Please select your preferred workout type');
+        return false;
+    }
+    
     return true;
 }
 
@@ -89,11 +101,6 @@ function validateForm(data) {
 function displayResults(data) {
     // Show results section
     document.getElementById('results-section').style.display = 'block';
-    
-    // Main Stats - Success Probability
-    const successProb = data.success_probability;
-    document.getElementById('success-bar').style.width = successProb + '%';
-    document.getElementById('success-value-main').textContent = successProb + '%';
     
     // Main Stats - Goal
     const goalHTML = `<span class="goal-text">${formatGoal(data.goal)}</span>`;
@@ -135,7 +142,7 @@ function displayResults(data) {
     `;
     document.getElementById('profile-info').innerHTML = profileHTML;
     
-    // Recommendations - Clean layout
+    // Recommendations - 4 items (no Expected Success)
     const recsHTML = `
         <div class="plan-item primary-item">
             <div class="plan-label">
@@ -164,13 +171,6 @@ function displayResults(data) {
                 Best Time
             </div>
             <div class="plan-value">${data.recommendations.best_time}</div>
-        </div>
-        <div class="plan-item success-item">
-            <div class="plan-label">
-                <span class="plan-icon">🎯</span>
-                Expected Success
-            </div>
-            <div class="plan-value">${data.recommendations.expected_success_rate}%</div>
         </div>
     `;
     document.getElementById('recommendations').innerHTML = recsHTML;

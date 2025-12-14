@@ -13,7 +13,7 @@
             <div class="hero-content">
                 <h1 class="glitch" data-text="AI WORKOUT RECOMMENDER">AI WORKOUT RECOMMENDER</h1>
                 <p class="tagline">Data-driven fitness plans powered by machine learning</p>
-                <p class="subtitle">Analyzed 51,633 workouts • 97% accuracy • Personalized for you</p>
+                <p class="subtitle">Analyzed 51,633 workouts • Personalized for you</p>
                 <button class="cta-button" onclick="scrollToForm()">
                     GET YOUR PLAN
                     <span class="arrow">→</span>
@@ -39,8 +39,8 @@
                     <div class="stat-label">Success Patterns</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">99.8%</div>
-                    <div class="stat-label">Model Accuracy</div>
+                    <div class="stat-number">2,759</div>
+                    <div class="stat-label">Exercises</div>
                 </div>
             </div>
         </div>
@@ -54,11 +54,13 @@
 
             <form id="recommendation-form" class="workout-form">
                 <div class="form-grid">
+                    <!-- Age -->
                     <div class="form-group">
                         <label for="age">Age</label>
                         <input type="number" id="age" name="age" min="15" max="80" required placeholder="25">
                     </div>
 
+                    <!-- Gender -->
                     <div class="form-group">
                         <label>Gender</label>
                         <div class="radio-group">
@@ -73,22 +75,56 @@
                         </div>
                     </div>
 
+                    <!-- Weight -->
                     <div class="form-group">
                         <label for="weight">Weight (kg)</label>
                         <input type="number" id="weight" name="weight" min="40" max="200" step="0.1" required placeholder="70">
                     </div>
 
+                    <!-- Height -->
                     <div class="form-group">
                         <label for="height">Height (m)</label>
                         <input type="number" id="height" name="height" min="1.4" max="2.2" step="0.01" required placeholder="1.75">
                     </div>
 
+                    <!-- 🆕 FITNESS GOAL -->
                     <div class="form-group full-width">
-                        <label for="experience">Experience Level</label>
+                        <label for="goal">
+                            What's Your Fitness Goal?
+                        </label>
+                        <select id="goal" name="goal" required>
+                            <option value="">Select your goal...</option>
+                            <option value="Weight_Loss">Weight Loss - Reduce body weight</option>
+                            <option value="Muscle_Gain">Muscle Gain - Build muscle mass</option>
+                            <option value="Fat_Loss">Fat Loss - Reduce body fat percentage</option>
+                            <option value="Fitness">General Fitness - Stay healthy & active</option>
+                        </select>
+                    </div>
+
+                    <!-- 🆕 PREFERRED WORKOUT TYPE -->
+                    <div class="form-group full-width">
+                        <label for="workout_type">
+                            Preferred Workout Type
+                        </label>
+                        <select id="workout_type" name="workout_type" required>
+                            <option value="">What do you enjoy most?</option>
+                            <option value="Strength">Strength Training - Weights & resistance</option>
+                            <option value="Cardio">Cardio - Running, cycling, swimming</option>
+                            <option value="HIIT">HIIT - High-intensity interval training</option>
+                            <option value="Yoga">Yoga - Flexibility & mindfulness</option>
+                            <option value="Mixed">Mixed - Variety of workouts</option>
+                        </select>
+                    </div>
+
+                    <!-- Experience Level -->
+                    <div class="form-group full-width">
+                        <label for="experience">
+                            Experience Level
+                        </label>
                         <select id="experience" name="experience" required>
-                            <option value="Beginner">Beginner - New to fitness</option>
-                            <option value="Intermediate" selected>Intermediate - Some experience</option>
-                            <option value="Expert">Expert - Advanced athlete</option>
+                            <option value="Beginner">🌱 Beginner - New to fitness</option>
+                            <option value="Intermediate" selected>🌿 Intermediate - Some experience</option>
+                            <option value="Expert">🌳 Expert - Advanced athlete</option>
                         </select>
                     </div>
                 </div>
@@ -109,19 +145,8 @@
                 <p class="results-subtitle">AI-analyzed recommendations based on 51,633 successful workout patterns</p>
             </div>
 
-            <!-- Main Stats Row -->
+            <!-- Main Stats Row - 2 columns only -->
             <div class="main-stats">
-                <div class="main-stat-card">
-                    <div class="stat-icon success-icon"></div>
-                    <div class="stat-content">
-                        <div class="stat-label">Success Probability</div>
-                        <div class="stat-value" id="success-value-main">--</div>
-                        <div class="stat-bar">
-                            <div class="stat-bar-fill" id="success-bar"></div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="main-stat-card">
                     <div class="stat-icon goal-icon"></div>
                     <div class="stat-content">
@@ -189,17 +214,10 @@
 
             <div class="results-actions">
                 <button class="secondary-button" onclick="window.print()">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z"/>
-                    </svg>
-                    Download Plan
+                    📄 Download Plan
                 </button>
                 <button class="cta-button" onclick="resetForm()">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12a9 9 0 0118 0 9 9 0 01-18 0z"/>
-                        <path d="M3 12h18"/>
-                    </svg>
-                    Try Another Profile
+                    🔄 Try Another Profile
                 </button>
             </div>
         </div>
