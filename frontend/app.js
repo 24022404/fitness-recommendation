@@ -109,6 +109,15 @@ function displayResults(data) {
     // Main Stats - Cluster
     document.getElementById('cluster-display').textContent = data.cluster_info;
     
+    // ═══════════════════════════════════════════════════════
+    // 🆕 MAIN STATS - SUCCESS RATE (NEW CARD!)
+    // ═══════════════════════════════════════════════════════
+    const successRate = data.success_rate.ai_prediction || data.success_rate.apriori;
+    const successColor = getSuccessColor(successRate);
+    
+    document.getElementById('success-rate-value').textContent = `${successRate}%`;
+    document.getElementById('success-rate-value').style.color = successColor;
+    
     // Profile Info - Clean metric cards
     const profileHTML = `
         <div class="metric-row">
@@ -263,6 +272,26 @@ function formatGoal(goal) {
         'Fitness': 'General Fitness'
     };
     return goalMap[goal] || goal;
+}
+
+// ═══════════════════════════════════════════════════════
+// 🆕 HELPERS FOR SUCCESS RATE
+// ═══════════════════════════════════════════════════════
+
+// Get color based on success rate
+function getSuccessColor(rate) {
+    if (rate >= 90) return '#10b981';  // Green (Excellent)
+    if (rate >= 75) return '#3b82f6';  // Blue (Good)
+    if (rate >= 60) return '#f59e0b';  // Orange (Average)
+    return '#ef4444';  // Red (Low)
+}
+
+// Get icon/emoji based on success rate
+function getSuccessIcon(rate) {
+    if (rate >= 90) return '🏆';  // Excellent
+    if (rate >= 75) return '✅';  // Good
+    if (rate >= 60) return '⚠️';  // Average
+    return '❌';  // Low
 }
 
 // Reset form

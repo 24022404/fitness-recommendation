@@ -2,12 +2,31 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 import numpy as np
+import pickle
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend to call API
 
 # Load data
 df = pd.read_csv('data/gym_workout_sessions.csv')
+
+# ═══════════════════════════════════════════════════════
+# 🆕 LOAD RANDOM FOREST MODEL & LABEL ENCODERS
+# ═══════════════════════════════════════════════════════
+try:
+    # Load trained Random Forest model
+    with open('models/rf_model.pkl', 'rb') as f:
+        rf_model = pickle.load(f)
+    
+    # Load label encoders
+    with open('models/label_encoders.pkl', 'rb') as f:
+        label_encoders = pickle.load(f)
+    
+    print("✅ Random Forest model loaded successfully")
+except:
+    print("⚠️ Random Forest model not found. Success rate prediction disabled.")
+    rf_model = None
+    label_encoders = None
 
 # Helper functions
 def calculate_bmi(weight, height):
@@ -50,28 +69,28 @@ def get_success_patterns(goal, workout_type):
             'frequency': '4-5 days/week',
             'protein': 'Medium',
             'best_time': 'Morning',
-            'success_rate': 80
+            'apriori_success_rate': 80  # From Apriori rules
         },
         'Muscle_Gain': {
             'workout_type': workout_type if workout_type != 'Mixed' else 'Strength Training',
             'frequency': '4-5 days/week',
             'protein': 'High',
             'best_time': 'Morning or Evening',
-            'success_rate': 100
+            'apriori_success_rate': 100  # From Apriori rules
         },
         'Fat_Loss': {
             'workout_type': workout_type if workout_type != 'Mixed' else 'HIIT',
             'frequency': '4-5 days/week',
             'protein': 'Medium-High',
             'best_time': 'Morning',
-            'success_rate': 75
+            'apriori_success_rate': 75
         },
         'Fitness': {
             'workout_type': workout_type if workout_type != 'Mixed' else 'Mixed (Cardio + Strength)',
             'frequency': '3-4 days/week',
             'protein': 'Medium',
             'best_time': 'Any',
-            'success_rate': 65
+            'apriori_success_rate': 65
         }
     }
     return patterns.get(goal, patterns['Fitness'])
@@ -116,6 +135,89 @@ def predict_cluster(age, bmi, fat_pct):
     else:
         return 3
 
+# ═══════════════════════════════════════════════════════
+# 🆕 PREDICT SUCCESS RATE using Random Forest
+# ═══════════════════════════════════════════════════════
+def predict_success_rate(user_profile):
+    """
+    Predict success rate using Random Forest
+    
+    Input:
+        user_profile: dict with all user info
+    
+    Output:
+        success_rate: float (0-100) or None if model unavailable
+    """
+    if rf_model is None or label_encoders is None:
+        return None
+    
+    try:
+        # Extract frequency from pattern (e.g., "4-5 days/week" -> 4)
+        freq_str = user_profile['frequency']
+        frequency = int(freq_str.split('-')[0]) if '-' in freq_str else 4
+        
+        # Map workout type
+        workout_mapping = {
+            'Cardio or HIIT': 'Cardio',
+            'Strength Training': 'Strength',
+            'Mixed (Cardio + Strength)': 'Strength',
+            'HIIT': 'HIIT',
+            'Yoga': 'Yoga',
+            'Cardio': 'Cardio',
+            'Strength': 'Strength',
+            'Mixed': 'Strength'
+        }
+        workout_for_rf = workout_mapping.get(user_profile['workout_type_raw'], 'Strength')
+        
+        # Encode categorical variables
+        goal_enc = label_encoders['Goal'].transform([user_profile['goal']])[0]
+        workout_enc = label_encoders['Workout_Type'].transform([workout_for_rf])[0]
+        protein_enc = label_encoders['Protein_Level'].transform([user_profile['protein_level']])[0]
+        
+        # Map best_time to Time
+        time_mapping = {
+            'Morning': 'Morning',
+            'Evening': 'Evening',
+            'Morning or Evening': 'Morning',
+            'Any': 'Morning',
+            'Afternoon': 'Afternoon'
+        }
+        workout_time = time_mapping.get(user_profile['best_time'], 'Morning')
+        time_enc = label_encoders['Workout_Time'].transform([workout_time])[0]
+        
+        exp_enc = label_encoders['Experience_Level'].transform([user_profile['experience']])[0]
+        gender_enc = label_encoders['Gender'].transform([user_profile['gender']])[0]
+        
+        # Create feature vector (12 features - MUST match training order!)
+        # ['Goal', 'Workout_Type', 'Frequency_per_week', 'Protein_Level', 
+        #  'Workout_Time', 'Duration_Minutes', 'BMI', 'Fat_pct', 'Age', 
+        #  'Gender', 'Experience_Level', 'Num_Exercises']
+        
+        features = [
+            goal_enc,                      # Goal
+            workout_enc,                   # Workout_Type
+            frequency,                     # Frequency_per_week
+            protein_enc,                   # Protein_Level
+            time_enc,                      # Workout_Time
+            55,                           # Duration_Minutes (average)
+            user_profile['bmi'],          # BMI
+            user_profile['fat_pct'],      # Fat_pct
+            user_profile['age'],          # Age
+            gender_enc,                    # Gender
+            exp_enc,                       # Experience_Level
+            5                             # Num_Exercises (average)
+        ]
+        
+        # Predict probability
+        proba = rf_model.predict_proba([features])[0]
+        success_rate = round(proba[1] * 100, 1)  # % of Success=1
+        
+        return success_rate
+        
+    except Exception as e:
+        print(f"Error in RF prediction: {e}")
+        return None
+
 # API Routes
 @app.route('/')
 def home():
@@ -152,6 +254,24 @@ def recommend():
         patterns = get_success_patterns(goal, workout_type)
         exercises = get_exercises(workout_type, experience)
         
+        # ═══════════════════════════════════════════════════════
+        # 🆕 PREDICT SUCCESS RATE using Random Forest
+        # ═══════════════════════════════════════════════════════
+        user_profile_for_rf = {
+            'age': age,
+            'gender': gender,
+            'bmi': bmi,
+            'fat_pct': fat_pct,
+            'goal': goal,
+            'experience': experience,
+            'frequency': patterns['frequency'],
+            'protein_level': nutrition['protein_level'],
+            'best_time': patterns['best_time'],
+            'workout_type_raw': workout_type
+        }
+        
+        ai_success_rate = predict_success_rate(user_profile_for_rf)
+        
         # Build response
         response = {
             'profile': {
@@ -179,6 +299,12 @@ def recommend():
                 'best_time': patterns['best_time']
             },
             'exercises': exercises,
+            # 🆕 SUCCESS RATE INFO
+            'success_rate': {
+                'apriori': patterns['apriori_success_rate'],  # From association rules
+                'ai_prediction': ai_success_rate,  # From Random Forest
+                'available': ai_success_rate is not None
+            },
             'insights': {
                 'top_success_factor': 'Frequency (4-5 days/week is optimal)',
                 'protein_importance': f"{nutrition['protein_level']} protein intake recommended for {goal.replace('_', ' ')}",

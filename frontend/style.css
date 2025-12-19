@@ -295,10 +295,12 @@ input[type="radio"] {
     margin-top: 10px;
 }
 
-/* Main Stats Cards - UPDATED to 2 columns */
+/* ═══════════════════════════════════════════════════════ */
+/* 🆕 Main Stats Cards - UPDATED to 3 columns */
+/* ═══════════════════════════════════════════════════════ */
 .main-stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
     margin-bottom: 50px;
 }
@@ -320,11 +322,25 @@ input[type="radio"] {
     box-shadow: 0 10px 30px rgba(255, 70, 85, 0.2);
 }
 
+/* 🆕 SUCCESS CARD special styling */
+.main-stat-card.success-card {
+    background: linear-gradient(135deg, rgba(0, 217, 163, 0.05), rgba(0, 168, 126, 0.05));
+    border: 2px solid rgba(0, 217, 163, 0.3);
+}
+
+.main-stat-card.success-card:hover {
+    border-color: var(--success-green);
+    box-shadow: 0 10px 30px rgba(0, 217, 163, 0.3);
+}
+
 .stat-icon {
     width: 60px;
     height: 60px;
     border-radius: 15px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .success-icon {
@@ -337,6 +353,11 @@ input[type="radio"] {
 
 .cluster-icon {
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+/* 🆕 SUCCESS EMOJI styling */
+.success-emoji {
+    font-size: 2rem;
 }
 
 .stat-content {
@@ -371,6 +392,22 @@ input[type="radio"] {
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+/* 🆕 SUCCESS RATE value styling */
+.stat-value-success {
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+    /* Color set dynamically by JS */
+}
+
+.stat-sublabel {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stat-bar {
